@@ -1,7 +1,6 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-// *** इस लाइन को नीचे वाली लाइन से बदलें! ***
-import { MyRoomState, Player } from "../../src/schema/MyRoomState"; // <-- यह पाथ आजमाएं!
+import { MyRoomState, Player } from "../schema/MyRoomState"; // <-- यह सबसे सामान्य और सही पाथ है
 
 // ... बाकी कोड
 export class MyRoom extends Room<MyRoomState> {
