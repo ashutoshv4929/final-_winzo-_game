@@ -45,10 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let walletBalance = 85;
 
     // --- Colyseus Client Setup ---
-    // **सबसे महत्वपूर्ण बदलाव यहाँ है!**
-    // यह सुनिश्चित करता है कि ब्राउज़र Render पर आपके सर्वर से कनेक्ट हो
     const renderServerUrl = "wss://final-winzo-game-lf1r.onrender.com"; // आपका Render URL
-
     const client = new Colyseus.Client(
         (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
             ? "ws://localhost:2567" // लोकल डेवलपमेंट के लिए
@@ -62,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Audio ---
     let audioContext;
     const audioBuffers = {};
-    // सुनिश्चित करें कि ये फ़ाइलें आपके 'public' फोल्डर में हैं
     const bgMusic = new Audio('bg_music.mp3');
     bgMusic.loop = true;
     bgMusic.volume = 0.4;
@@ -141,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             room.state.players.onAdd = (player, sessionId) => {
                 player.listen("score", (currentScore) => {
                     console.log(`Player ${player.playerNumber} score updated to: ${currentScore}`);
-                    updateScoreboard(player.playerNumber, currentScore);
+                    updateScoreboard(player.playerNumber, currentScore); // स्कोर को अपडेट करें जब सर्वर बताता है
                 });
 
                 player.history.onAdd = (item, index) => {
@@ -154,6 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateDiceHistory(player.playerNumber, player.history);
                 };
             };
+
+            // *** बदलाव यहाँ है! ***
+            // सर्वर से 'scores_updated' मैसेज मिलने पर UI में कुछ अतिरिक्त लॉजिक
+            room.onMessage("scores_updated", () => {
+                console.log("Scores updated by server after animation completion.");
+                // आप यहाँ कुछ और विजुअल फीडबैक जोड़ सकते हैं अगर चाहें
+            });
+            // *** बदलाव यहाँ समाप्त होता है! ***
 
             // --- MESSAGES FROM SERVER ---
             room.onMessage("dice_rolled", (message) => {
@@ -276,8 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rotations = {
                     1: 'rotateX(0deg) rotateY(0deg)',
                     2: 'rotateY(180deg) rotateX(0deg)',
-                    3: 'rotateY(-90deg) rotateX(0deg)',
-                    4: 'rotateY(90deg) rotateX(0deg)',
+                    3: 'rotateY(-90deg) rotateY(0deg)', // Fixed a potential typo here
+                    4: 'rotateY(90deg) rotateY(0deg)',  // Fixed a potential typo here
                     5: 'rotateX(90deg) rotateY(0deg)',
                     6: 'rotateX(-90deg) rotateY(0deg)'
                 };
