@@ -13,7 +13,7 @@ const port = 2567;
 // यह लाइन public फोल्डर से HTML, CSS, JS फाइल्स को सर्व करने के लिए ज़रूरी है
 // __dirname हमेशा वर्तमान फाइल की डायरेक्टरी होती है (Render पर: /opt/render/project/src/)
 // तो यह पाथ /opt/render/project/src/public को पॉइंट करेगा, जो सही है।
-app.use(express.static(path.resolve(__dirname, "public"))); // 'path.join'
+app.use(express.static(path.resolve(__dirname, "public"))); // 'path.join' को 'path.resolve' से बदला
 
 const server = http.createServer(app);
 
