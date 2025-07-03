@@ -1,8 +1,7 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-import { MyRoomState, Player } from "../schema/MyRoomState"; // <-- यह पाथ सही है अगर आपका प्रोजेक्ट स्ट्रक्चर ऐसा है:
-                                                             // project-root/src/rooms/MyRoom.ts
-                                                             // project-root/src/schema/MyRoomState.ts
+// *** इस लाइन को नीचे वाली लाइन से बदलें! ***
+import { MyRoomState, Player } from "./schema/MyRoomState"; // <-- यह पाथ 100% सही है आपके वर्तमान स्ट्रक्चर के लिए!
 
 export class MyRoom extends Room<MyRoomState> {
     maxClients = 2;
@@ -12,7 +11,6 @@ export class MyRoom extends Room<MyRoomState> {
         this.setState(new MyRoomState());
 
         this.onMessage("roll_dice", (client) => {
-            // केवल वर्तमान खिलाड़ी और जब गेम ओवर न हो, तभी रोल करने दें
             if (this.state.gameOver || this.state.currentPlayerId !== client.sessionId) {
                 console.warn(`Roll denied for ${client.sessionId}: Game Over or Not their turn.`);
                 return;
@@ -25,10 +23,9 @@ export class MyRoom extends Room<MyRoomState> {
             }
 
             const roll = Math.floor(Math.random() * 6) + 1;
-            player.history.push(roll); // इतिहास अपडेट करें
+            player.history.push(roll);
             this.broadcast("dice_rolled", { roll, player: player.playerNumber, sessionId: client.sessionId });
 
-            // एनीमेशन पूरा होने की प्रतीक्षा के लिए फ़्लैग को फ़ॉल्स करें
             this.state.animationCompletedFlags.set(client.sessionId, false);
         });
 
@@ -42,23 +39,17 @@ export class MyRoom extends Room<MyRoomState> {
                 return;
             }
 
-            // इस खिलाड़ी के लिए एनीमेशन को 'true' पर सेट करें
             this.state.animationCompletedFlags.set(client.sessionId, true);
 
-            // जांचें कि क्या सभी सक्रिय खिलाड़ियों ने अपना एनीमेशन पूरा कर लिया है
             const allPlayersCompletedAnimation = Array.from(this.state.players.keys())
                 .every(sessionId => this.state.animationCompletedFlags.get(sessionId) === true);
 
-            // **स्कोर अपडेट और टर्न बदलने का लॉजिक यहाँ है (केवल जब सभी एनीमेशन पूरे हो जाएं)**
             if (allPlayersCompletedAnimation) {
-                // *** यहाँ स्कोर अपडेट का लॉजिक बदला गया है! ***
-                // केवल जिसने रोल किया है, उसका स्कोर अपडेट करें।
-                // हम प्रत्येक खिलाड़ी के नवीनतम रोल से उनके स्कोर को अपडेट करते हैं।
                 this.state.players.forEach((p: Player) => {
                     const roll = p.history[p.history.length - 1];
-                    p.score += roll; // यह स्कोर अपडेट करेगा
+                    p.score += roll;
                 });
-                this.broadcast("scores_updated"); // क्लाइंट को बताएं कि स्कोर अपडेट हो गए हैं
+                this.broadcast("scores_updated");
 
                 const allRolled = Array.from(this.state.players.values())
                     .every((p: Player) => p.history.length === this.TOTAL_TURNS);
@@ -66,22 +57,20 @@ export class MyRoom extends Room<MyRoomState> {
                 if (allRolled) {
                     this.endGame();
                 } else {
-                    // *** यहाँ टर्न लॉजिक बदला गया है ताकि यह अगले खिलाड़ी की बारी हो ***
                     const ids = Array.from(this.state.players.keys());
-                    const currentClientIndex = ids.indexOf(client.sessionId); // वर्तमान खिलाड़ी का इंडेक्स
-                    const nextClientIndex = (currentClientIndex + 1) % ids.length; // अगले खिलाड़ी का इंडेक्स (लपेटें)
-                    const nextPlayerSessionId = ids[nextClientIndex]; // अगले खिलाड़ी का sessionId
+                    const currentClientIndex = ids.indexOf(client.sessionId);
+                    const nextClientIndex = (currentClientIndex + 1) % ids.length;
+                    const nextPlayerSessionId = ids[nextClientIndex];
                     this.state.currentPlayerId = nextPlayerSessionId;
 
                     const totalRolls = Array.from(this.state.players.values()).reduce((sum, p: Player) => sum + p.history.length, 0);
                     this.state.currentRound = Math.floor(totalRolls / this.maxClients) + 1;
 
-                    // एनीमेशन फ़्लैग्स को रीसेट करें नए टर्न के लिए
                     this.state.players.forEach((p: Player) => this.state.animationCompletedFlags.set(p.sessionId, false));
                 }
             }
         });
-    } // onCreate() का बंद होने वाला ब्रेस
+    }
 
     onJoin(client: Client) {
         const player = new Player();
@@ -90,19 +79,16 @@ export class MyRoom extends Room<MyRoomState> {
         this.state.players.set(client.sessionId, player);
         console.log(`Player ${client.sessionId} joined. Total players: ${this.state.players.size}`);
 
-        // जब दोनों खिलाड़ी जुड़ जाएं तो खेल शुरू करें
         if (this.state.players.size === this.maxClients) {
             this.state.currentRound = 1;
-            // पहले खिलाड़ी को बारी दें
-            this.state.currentPlayerId = Array.from(this.state.players.keys())[0]; // पहले खिलाड़ी का sessionId
+            this.state.currentPlayerId = Array.from(this.state.players.keys())[0];
             this.broadcast("chat", { senderName: "Server", text: "Game Shuru!" });
             console.log(`Game started. First turn for: ${this.state.currentPlayerId}`);
         } else {
             this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.size}/${this.maxClients})` });
         }
-    } // onJoin() का बंद होने वाला ब्रेस (यह मिसिंग था!)
+    }
 
-    // endGame मेथड
     endGame() {
         this.state.gameOver = true;
         const playersArray = Array.from(this.state.players.values());
@@ -112,7 +98,6 @@ export class MyRoom extends Room<MyRoomState> {
         this.state.finalScores.set("1", p1 ? p1.score : 0);
         this.state.finalScores.set("2", p2 ? p2.score : 0);
 
-        // विजेता का निर्धारण
         if (p1 && p2) {
             if (p1.score > p2.score) {
                 this.state.winnerSessionId = p1.sessionId;
@@ -122,7 +107,7 @@ export class MyRoom extends Room<MyRoomState> {
                 this.state.winnerSessionId = "";
             }
         } else {
-            this.state.winnerSessionId = ""; // अगर पर्याप्त खिलाड़ी नहीं हैं
+            this.state.winnerSessionId = "";
         }
 
         this.broadcast("game_over", {
@@ -154,12 +139,11 @@ export class MyRoom extends Room<MyRoomState> {
         this.state.players.delete(client.sessionId);
         console.log(`Player ${client.sessionId} left. Remaining players: ${this.state.players.size}`);
 
-        // अगर गेम चल रहा है और एक खिलाड़ी छोड़ देता है
         if (!this.state.gameOver && this.state.players.size < this.maxClients) {
-            this.state.gameOver = true; // गेम को ओवर करें
+            this.state.gameOver = true;
             this.broadcast("chat", { senderName: "Server", text: "Player left, game ended!" });
-            this.state.winnerSessionId = ""; // कोई विजेता नहीं
-            this.state.finalScores.clear(); // स्कोर साफ़ करें
+            this.state.winnerSessionId = "";
+            this.state.finalScores.clear();
             this.broadcast("game_over", {
                 finalScores: {},
                 winnerId: "",
