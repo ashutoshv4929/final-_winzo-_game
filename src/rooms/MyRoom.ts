@@ -1,6 +1,6 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-import { MyRoomState, Player } from "../../src/schema/MyRoomState";
+import { MyRoomState, Player } from "../schema/MyRoomState";
 
 export class MyRoom extends Room<MyRoomState> {
     maxClients = 2;
