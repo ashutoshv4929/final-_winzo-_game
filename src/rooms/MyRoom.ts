@@ -1,6 +1,8 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-import { MyRoomState, Player } from "../schema/MyRoomState";
+import { MyRoomState, Player } from "./schema/MyRoomState"; // <-- यह पाथ आजमाएं!
+
+// ... बाकी कोड
 
 export class MyRoom extends Room<MyRoomState> {
     maxClients = 2;
