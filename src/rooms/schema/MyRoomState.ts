@@ -1,5 +1,5 @@
 // src/schema/MyRoomState.ts
-import { Schema, type } from "@colyseus/schema";
+import { Schema, type, MapSchema } from "@colyseus/schema"; // <-- यहाँ MapSchema जोड़ा
 
 export class Player extends Schema {
   @type("number") playerNumber: number = 0;
