@@ -2,21 +2,17 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "node", // <--- यह जरूरी है
     "lib": ["es2018", "dom"],
     "outDir": "./build",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true // <--- यह केसिंग एरर्स पकड़ने के लिए
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts"], // <--- यह सुनिश्चित करता है कि src के अंदर सब कुछ कंपाइल हो
+  "exclude": ["node_modules", "public", "build"] // build फोल्डर को exclude करें
 }
