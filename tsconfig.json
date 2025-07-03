@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
-    "moduleResolution": "node", // <-- सुनिश्चित करें कि यह "node" पर सेट है
+    "moduleResolution": "node",
     "lib": ["es2018", "dom"],
     "outDir": "./build",
     "rootDir": "./src",
@@ -11,8 +11,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./src" // <-- यह यहाँ होना चाहिए!
+    "forceConsistentCasingInFileNames": true
+    // "baseUrl": "./src" // <-- यह लाइन नहीं होनी चाहिए या कमेंट की हुई होनी चाहिए!
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "public", "build"]
