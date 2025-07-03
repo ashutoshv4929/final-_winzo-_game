@@ -1,8 +1,9 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-import { MyRoomState, Player } from "../schema/MyRoomState"; // <-- यह सबसे सामान्य और सही पाथ है
+import { MyRoomState, Player } from "../schema/MyRoomState"; // <-- यह पाथ सही है अगर आपका प्रोजेक्ट स्ट्रक्चर ऐसा है:
+                                                             // project-root/src/rooms/MyRoom.ts
+                                                             // project-root/src/schema/MyRoomState.ts
 
-// ... बाकी कोड
 export class MyRoom extends Room<MyRoomState> {
     maxClients = 2;
     TOTAL_TURNS = 3;
@@ -66,9 +67,10 @@ export class MyRoom extends Room<MyRoomState> {
                     this.endGame();
                 } else {
                     // *** यहाँ टर्न लॉजिक बदला गया है ताकि यह अगले खिलाड़ी की बारी हो ***
-                    const currentClientIndex = Array.from(this.state.players.keys()).indexOf(client.sessionId);
-                    const nextClientIndex = (currentClientIndex + 1) % this.state.players.size;
-                    const nextPlayerSessionId = Array.from(this.state.players.keys())[nextClientIndex];
+                    const ids = Array.from(this.state.players.keys());
+                    const currentClientIndex = ids.indexOf(client.sessionId); // वर्तमान खिलाड़ी का इंडेक्स
+                    const nextClientIndex = (currentClientIndex + 1) % ids.length; // अगले खिलाड़ी का इंडेक्स (लपेटें)
+                    const nextPlayerSessionId = ids[nextClientIndex]; // अगले खिलाड़ी का sessionId
                     this.state.currentPlayerId = nextPlayerSessionId;
 
                     const totalRolls = Array.from(this.state.players.values()).reduce((sum, p: Player) => sum + p.history.length, 0);
@@ -98,13 +100,14 @@ export class MyRoom extends Room<MyRoomState> {
         } else {
             this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.size}/${this.maxClients})` });
         }
-    }
+    } // onJoin() का बंद होने वाला ब्रेस (यह मिसिंग था!)
 
+    // endGame मेथड
     endGame() {
         this.state.gameOver = true;
         const playersArray = Array.from(this.state.players.values());
-        const p1 = playersArray.find(p => p.playerNumber === 1);
-        const p2 = playersArray.find(p => p.playerNumber === 2);
+        const p1 = playersArray.find(p => p.playerNumber === 1) as Player;
+        const p2 = playersArray.find(p => p.playerNumber === 2) as Player;
 
         this.state.finalScores.set("1", p1 ? p1.score : 0);
         this.state.finalScores.set("2", p2 ? p2.score : 0);
@@ -116,12 +119,11 @@ export class MyRoom extends Room<MyRoomState> {
             } else if (p2.score > p1.score) {
                 this.state.winnerSessionId = p2.sessionId;
             } else {
-                this.state.winnerSessionId = ""; // टाई के लिए खाली स्ट्रिंग
+                this.state.winnerSessionId = "";
             }
         } else {
             this.state.winnerSessionId = ""; // अगर पर्याप्त खिलाड़ी नहीं हैं
         }
-
 
         this.broadcast("game_over", {
             finalScores: Object.fromEntries(this.state.finalScores),
@@ -139,7 +141,7 @@ export class MyRoom extends Room<MyRoomState> {
             p.score = 0;
             p.history.length = 0;
         });
-        this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || ""; // गेम रिसेट होने पर पहले खिलाड़ी को बारी दें
+        this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || "";
 
         this.state.animationCompletedFlags.clear();
         this.state.players.forEach((p: Player) => this.state.animationCompletedFlags.set(p.sessionId, false));
