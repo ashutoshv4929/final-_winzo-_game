@@ -13,6 +13,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true // <--- यह केसिंग एरर्स पकड़ने के लिए
   },
- "include": ["src/**/*"], // ये लाइन देखें
+  "include": ["src/**/*"], // ये लाइन देखें
   "exclude": ["node_modules", "public", "build"] // build फोल्डर को exclude करें
 }
