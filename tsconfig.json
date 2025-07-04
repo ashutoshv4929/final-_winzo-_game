@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "ES2018",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "lib": ["es2018", "dom"],
-    "outDir": "./build",
+    "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-    // "baseUrl": "./src" // <--- यह लाइन यहाँ नहीं होनी चाहिए या कमेंट की हुई होनी चाहिए!
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "public", "build"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
