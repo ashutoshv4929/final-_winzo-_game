@@ -2,11 +2,11 @@
   "name": "your-colyseus-game-server",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc && npm run copy-static",
     "copy-static": "cp -r public dist/",
-    "start": "node build/index.js"
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
