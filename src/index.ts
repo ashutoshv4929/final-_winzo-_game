@@ -3,7 +3,7 @@ import http from "http";
 import path from "path";
 import express from "express";
 import { Server } from "colyseus";
-import { MyRoom } from "./rooms/MyRoom"; // MyRoom को यहाँ इम्पोर्ट करना सही है
+import { MyRoom } from "./MyRoom"; // MyRoom को यहाँ इम्पोर्ट करना सही है
 
 const app = express();
 const port = 2567; // सुनिश्चित करें कि यह पोर्ट आपके Render सर्विस पोर्ट से मेल खाता है
