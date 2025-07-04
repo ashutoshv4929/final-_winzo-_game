@@ -4,7 +4,7 @@ import { Server } from "colyseus";
 import { MyRoom } from "./MyRoom";
 
 const app = express();
-const port = 8080; // Changed to standard port
+const port = 8080;
 
 // Serve static files
 app.use(express.static("public"));
@@ -14,10 +14,7 @@ const httpServer = require('http').createServer(app);
 
 // Initialize Colyseus server
 const gameServer = new Server({
-    server: httpServer,
-    transport: {
-        type: 'ws'
-    }
+    server: httpServer
 });
 
 // Register room
