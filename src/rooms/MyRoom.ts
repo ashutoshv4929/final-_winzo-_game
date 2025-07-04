@@ -73,7 +73,9 @@ export class MyRoom extends Room<MyRoomState> {
                 console.log(`[Server] All game rolls completed for all rounds: ${allGameRollsCompleted}`);
 
                 if (allGameRollsCompleted) {
-                    this.endGame();
+                   endGame() {
+        console.log("Game is ending now!");
+        this.state.gameOver = true;
                 } else {
                     const ids = Array.from(this.state.players.keys());
                     const currentClientIndex = ids.indexOf(this.state.currentPlayerId);
