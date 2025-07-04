@@ -1,6 +1,6 @@
 // src/rooms/MyRoom.ts
 import { Room, Client } from "colyseus";
-import { MyRoomState, Player } from "./schema/MyRoomState"; // <-- यह पाथ सही है
+import { MyRoomState, Player } from "./schema/MyRoomState";
 
 export class MyRoom extends Room<MyRoomState> {
     maxClients = 2;
@@ -113,6 +113,4 @@ export class MyRoom extends Room<MyRoomState> {
             this.state.currentRound = 1;
             this.state.currentPlayerId = Array.from(this.state.players.keys())[0];
             this.broadcast("chat", { senderName: "Server", text: "Game Shuru!" });
-            console.log(`[Server] Game started. First turn for: ${this.state.currentPlayerId}`);
-        } else {
-            this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.size}/${this.maxClients})` });
+            console.log(`
