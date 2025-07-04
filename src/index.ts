@@ -7,7 +7,7 @@ const app = express();
 const port = Number(process.env.PORT) || 2567;
 
 // Serve static files
-app.use(express.static("../public"));
+app.use(express.static(__dirname + "/../public"));
 
 // Create HTTP server
 const httpServer = require('http').createServer(app);
