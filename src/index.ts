@@ -14,7 +14,9 @@ const httpServer = require('http').createServer(app);
 
 // Initialize Colyseus server
 const gameServer = new Server({
-    server: httpServer
+    server: httpServer,
+    pingInterval: 10000,
+    pingTimeout: 10000
 });
 
 // Register room
@@ -23,6 +25,6 @@ gameServer.define("my_dice_room", MyRoom);
 // Start server
 httpServer.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log(`WebSocket server available at wss://final-winzo-game-lf1r.onrender.com:${port}`);
+    console.log(`WebSocket server available at wss://final-winzo-game-lf1r.onrender.com`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
 });

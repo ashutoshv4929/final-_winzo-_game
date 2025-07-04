@@ -46,14 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Colyseus Client Setup ---
     const client = new Colyseus.Client({
-        url: `wss://final-winzo-game-lf1r.onrender.com:8080`,
+        url: `wss://final-winzo-game-lf1r.onrender.com`,
         autoReconnect: {
             maxRetries: 10,
-            delay: 1000,
-            maxDelay: 10000
-        },
-        pingInterval: 5000,
-        pingTimeout: 3000
+            delay: 2000,
+            maxDelay: 5000
+        }
     });
 
     client.onOpen.add(() => {
