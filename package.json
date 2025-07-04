@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && npm run copy-static",
-    "copy-static": "cpx \"public/**/*\" dist/public", 
+    "copy-static": "cpx \"public/**/*\" dist/public",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -14,12 +14,13 @@
   "dependencies": {
     "@colyseus/schema": "^1.0.x",
     "colyseus": "^0.14.x",
-    "express": "^4.19.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "@types/express": "^4.17.21",
     "@types/node": "^20.0.0",
-    "@types/express": "^4.17.21"
+    "cpx": "^1.5.0",
+    "typescript": "^5.0.0"
   }
 }
