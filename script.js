@@ -45,15 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let walletBalance = 85;
 
     // --- Colyseus Client Setup ---
-    const client = new Colyseus.Client(
-        "wss://final-winzo-game-lf1r.onrender.com", // आपका Render URL
-        {
-            autoReconnect: {
-                maxRetries: 10,
-                delay: 1000
-            }
+    const client = new Colyseus.Client({
+        url: "wss://final-winzo-game-lf1r.onrender.com", // आपका Render URL
+        autoReconnect: {
+            maxRetries: 10,
+            delay: 1000
         }
-    );
+    });
     console.log("Attempting to connect to:", client.endpoint);
 
     let room;

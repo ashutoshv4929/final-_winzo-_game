@@ -12,13 +12,17 @@ const port = Number(process.env.PORT) || 2567; // Use environment port or fallba
 app.use(express.static(path.join(__dirname, "../public")));
 
 const server = http.createServer(app);
-const gameServer = new Server({ server });
+const gameServer = new Server({
+    server
+});
 
 // Colyseus रूम को डिफ़ाइन करें
 gameServer.define("my_dice_room", MyRoom);
 
 // सर्वर को दिए गए पोर्ट पर सुनना शुरू करें
-gameServer.listen(port);
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
 
-console.log(`✅ Server is running on http://localhost:${port}`);
-console.log(`Server is available at wss://your-render-app-url.onrender.com (replace with actual URL)`);
+console.log(`Server is running on port ${port}`);
+console.log(`WebSocket server available at wss://${process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost'}:${port}`);
