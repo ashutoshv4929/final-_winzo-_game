@@ -13,7 +13,17 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 const server = http.createServer(app);
 const gameServer = new Server({
-    server
+    server,
+    transport: {
+        type: 'ws',
+        options: {
+            port: port,
+            wsOptions: {
+                clientTracking: true,
+                maxPayload: 1024 * 1024
+            }
+        }
+    }
 });
 
 // Colyseus रूम को डिफ़ाइन करें
@@ -22,7 +32,5 @@ gameServer.define("my_dice_room", MyRoom);
 // सर्वर को दिए गए पोर्ट पर सुनना शुरू करें
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log(`WebSocket server available at wss://${process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost'}:${port}`);
 });
-
-console.log(`Server is running on port ${port}`);
-console.log(`WebSocket server available at wss://${process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost'}:${port}`);
