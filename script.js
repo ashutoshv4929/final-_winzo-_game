@@ -52,6 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
         autoReconnect: {
             maxRetries: 10,
             delay: 1000
+        },
+        transport: {
+            type: 'ws',
+            options: {
+                maxPayload: 1024 * 1024
+            }
         }
     });
     console.log("Attempting to connect to:", client.endpoint);
