@@ -52,6 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
         autoReconnect: {
             maxRetries: 10,
             delay: 1000
+        },
+        transport: {
+            type: 'ws',
+            options: {
+                maxPayload: 1024 * 1024
+            }
         }
     });
 
@@ -59,11 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
     client.onOpen.add(() => {
         console.log("Connected to server successfully!");
         appendChatMessage("Connected to game server");
+        rollBtn.disabled = false;
     });
 
     client.onError.add((error) => {
         console.error("WebSocket error:", error);
         appendChatMessage(`Error: ${error}`);
+        rollBtn.disabled = true;
     });
 
     client.onClose.add((code) => {
