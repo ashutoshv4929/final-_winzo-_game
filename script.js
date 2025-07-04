@@ -50,13 +50,29 @@ document.addEventListener('DOMContentLoaded', () => {
         autoReconnect: {
             maxRetries: 10,
             delay: 1000
-        },
-        transport: {
-            type: 'ws',
-            options: {
-                maxPayload: 1024 * 1024
-            }
         }
+    });
+
+    // Add debug logging
+    client.onOpen.add(() => {
+        console.log("Connected to server successfully!");
+        appendChatMessage("Connected to game server");
+    });
+
+    client.onError.add((error) => {
+        console.error("WebSocket error:", error);
+        appendChatMessage(`Error: ${error}`);
+    });
+
+    client.onClose.add((code) => {
+        console.log("Disconnected from server with code:", code);
+        appendChatMessage("Disconnected from game server");
+        rollBtn.disabled = true;
+        
+        // Try to reconnect immediately
+        setTimeout(() => {
+            connectToColyseus();
+        }, 1000);
     });
     console.log("Attempting to connect to:", client.endpoint);
 

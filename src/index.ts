@@ -4,10 +4,10 @@ import { Server } from "colyseus";
 import { MyRoom } from "./MyRoom";
 
 const app = express();
-const port = 2567; // Fixed port
+const port = 2567;
 
 // Serve static files
-app.use(express.static(__dirname + "/../public"));
+app.use(express.static("public"));
 
 // Create HTTP server
 const httpServer = require('http').createServer(app);
