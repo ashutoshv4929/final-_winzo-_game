@@ -1,11 +1,11 @@
 // src/schema/MyRoomState.ts
-import { Schema, type, MapSchema } from "@colyseus/schema"; // <-- यहाँ MapSchema जोड़ा
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema"; // <-- ArraySchema भी इम्पोर्ट करें
 
 export class Player extends Schema {
   @type("number") playerNumber: number = 0;
   @type("string") sessionId: string = "";
   @type("number") score: number = 0;
-  @type(["number"]) history = new Array<number>();
+  @type(["number"]) history = new ArraySchema<number>(); // <-- यहाँ ArraySchema का उपयोग करें!
 }
 
 export class MyRoomState extends Schema {
@@ -16,7 +16,8 @@ export class MyRoomState extends Schema {
   @type({ map: "number" }) finalScores = new MapSchema<number>();
   @type("string") winnerSessionId: string = "";
 
-  // **नया बदलाव यहाँ**
-  // यह ट्रैक करेगा कि किस खिलाड़ी ने अपना डाइस एनीमेशन पूरा कर लिया है
   @type({ map: "boolean" }) animationCompletedFlags = new MapSchema<boolean>();
+
+  // **यह सबसे महत्वपूर्ण प्रॉपर्टी है जो डाइस की वर्तमान वैल्यू को स्टोर करती है**
+  @type("number") currentDiceValue: number = 0; // <-- यह लाइन जोड़ें!
 }
