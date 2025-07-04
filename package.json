@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node build/index.js" // <-- इस लाइन के अंत से कोई भी कमेंट नहीं होना चाहिए!
+    "start": "node build/index.js" // 
   },
   "keywords": [],
   "author": "",
