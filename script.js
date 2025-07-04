@@ -317,38 +317,28 @@ document.addEventListener('DOMContentLoaded', () => {
         room.send("roll_dice");
     }
 
-    }
-    playSound('button_click.mp3');
-    rollBtn.disabled = true;
-    appendChatMessage(`Player ${myPlayerId} is rolling...`);
-    room.send("roll_dice");
-}
+    function animateDiceRoll(roll, playerWhoRolled) {
+        const diceFaces = ['dice-1', 'dice-2', 'dice-3', 'dice-4', 'dice-5', 'dice-6'];
+        diceCubeEl.classList.remove(...diceFaces);
+        diceCubeEl.classList.add(`dice-${roll}`);
+        appendChatMessage(`Player ${playerWhoRolled} rolled a ${roll}!`);
+        
+        // Turn update
+        if (room) {
+            room.send('turn_updated', { 
+                playerId: playerWhoRolled,
+                roll: roll
+            });
+            turnIndicatorEl.textContent = `Player ${currentActivePlayerNumber}'s Turn`;
+            rollBtn.textContent = `🎲 Player ${currentActivePlayerNumber} Roll`;
+            player1Panel.classList.toggle('active-player', currentActivePlayerNumber === 1);
+            player2Panel.classList.toggle('active-player', currentActivePlayerNumber === 2);
 
-// --- UI Update Functions ---
-function animateDiceRoll(roll, playerWhoRolled) {
-    const diceFaces = ['dice-1', 'dice-2', 'dice-3', 'dice-4', 'dice-5', 'dice-6'];
-    diceCubeEl.classList.remove(...diceFaces);
-    diceCubeEl.classList.add(`dice-${roll}`);
-    appendChatMessage(`Player ${playerWhoRolled} rolled a ${roll}!`);
-    
-    // टर्न अपडेट
-    if (room) {
-        room.send('turn_updated', { 
-            playerId: playerWhoRolled,
-            roll: roll
-            if (player.sessionId === currentPlayerSessionId) {
-                currentActivePlayerNumber = player.playerNumber;
+            rollBtn.disabled = !(myPlayerId && currentPlayerSessionId === room.sessionId && !state.gameOver);
+            if (state.gameOver) {
+                rollBtn.disabled = true;
+                rollBtn.textContent = 'Game Over';
             }
-        });
-        turnIndicatorEl.textContent = `Player ${currentActivePlayerNumber}'s Turn`;
-        rollBtn.textContent = `🎲 Player ${currentActivePlayerNumber} Roll`;
-        player1Panel.classList.toggle('active-player', currentActivePlayerNumber === 1);
-        player2Panel.classList.toggle('active-player', currentActivePlayerNumber === 2);
-
-        rollBtn.disabled = !(myPlayerId && currentPlayerSessionId === room.sessionId && !state.gameOver);
-        if (state.gameOver) {
-            rollBtn.disabled = true;
-            rollBtn.textContent = 'Game Over';
         }
     }
 

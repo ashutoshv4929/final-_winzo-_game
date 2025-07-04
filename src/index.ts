@@ -14,9 +14,7 @@ const httpServer = require('http').createServer(app);
 
 // Initialize Colyseus server
 const gameServer = new Server({
-    server: httpServer,
-    pingInterval: 2000,
-    pingMaxRetries: 3
+    server: httpServer
 });
 
 // Register room
