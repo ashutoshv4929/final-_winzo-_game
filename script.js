@@ -45,23 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let walletBalance = 85;
 
     // --- Colyseus Client Setup ---
-    // Get the current hostname from the URL
-    const hostname = window.location.hostname;
     const client = new Colyseus.Client({
-        url: `wss://${hostname}:2567`,
+        url: `wss://${window.location.hostname}:8080`,
         autoReconnect: {
             maxRetries: 10,
             delay: 1000
-        },
-        transport: {
-            type: 'ws',
-            options: {
-                maxPayload: 1024 * 1024
-            }
         }
     });
 
-    // Add debug logging
     client.onOpen.add(() => {
         console.log("Connected to server successfully!");
         appendChatMessage("Connected to game server");
