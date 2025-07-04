@@ -70,7 +70,7 @@ export class MyRoom extends Room<MyRoomState> {
                 this.state.players.forEach((p: Player) => {
                     // सुनिश्चित करें कि स्कोर सिर्फ एक बार अपडेट हो प्रति रोल/राउंड
                     // यह तभी अपडेट होना चाहिए जब खिलाड़ी ने वर्तमान राउंड में रोल किया हो और उसका स्कोर अभी तक इस रोल के लिए अपडेट न हुआ हो
-                    if (p.history.length === this.state.currentRound) { // Removed the `&& p.score !== ...` as it's not strictly necessary if logic is sound
+                    if (p.history.length === this.state.currentRound) {
                         const rollToAdd = p.history[p.history.length - 1]; // आखिरी रोल
                         p.score += rollToAdd;
                         console.log(`[Server] Player ${p.playerNumber} score updated to ${p.score} with roll ${rollToAdd}.`);
@@ -78,12 +78,11 @@ export class MyRoom extends Room<MyRoomState> {
                         console.warn(`[Server] Player ${p.playerNumber} has not rolled yet for current round.`);
                     }
                 });
-                // this.broadcast("scores_updated"); // इसकी भी अब सीधे ज़रूरत नहीं, स्टेट सिंक्रनाइज़ करेगी
 
                 const allGameRollsCompleted = Array.from(this.state.players.values())
                     .every((p: Player) => p.history.length === this.TOTAL_TURNS);
 
-                console.log(`[Server] All game rolls completed for all rounds: ${allGameRolllsCompleted}`); // This line was fixed before, but re-added here.
+                console.log(`[Server] All game rolls completed for all rounds: ${allGameRollsCompleted}`);
 
                 if (allGameRollsCompleted) {
                     this.endGame();
@@ -93,7 +92,7 @@ export class MyRoom extends Room<MyRoomState> {
                     const currentClientIndex = ids.indexOf(this.state.currentPlayerId); // वर्तमान सक्रिय खिलाड़ी
                     const nextClientIndex = (currentClientIndex + 1) % ids.length; // अगले खिलाड़ी का इंडेक्स
                     this.state.currentPlayerId = ids[nextClientIndex]; // अगले खिलाड़ी का टर्न
-                    console.log(`[Server] Turn switched to: ${this.state.currentPlayerId}`); // <-- यह लाइन अब पूरी है
+                    console.log(`[Server] Turn switched to: ${this.state.currentPlayerId}`);
 
                     // राउंड बढ़ाएं
                     this.state.currentRound++;
@@ -119,9 +118,10 @@ export class MyRoom extends Room<MyRoomState> {
                 // `currentDiceValue` को यहाँ रीसेट न करें यदि आप चाहते हैं कि डाइस तब तक दिखे जब तक सभी ने रोल न कर लिया हो।
                 // इसे 'currentRoundRolls' true होने पर ही रीसेट करें।
             }
-        } // <-- यह मिसिंग '}' था, इसे यहाँ जोड़ा गया है!
-    } // <-- यह भी शायद मिसिंग था
-    // ^^^ Lines 149/150 in the provided code snippet where the '}' was expected
+        }); // onMessage("animation_completed") का क्लोजिंग ब्रेस
+
+    } // onCreate() मेथड का क्लोजिंग ब्रेस
+
 
     onJoin(client: Client, options?: any, auth?: any) { // Colyseus के onJoin सिग्नेचर में options और auth भी होते हैं
         console.log(`[Server] Player ${client.sessionId} attempting to join.`);
@@ -190,7 +190,7 @@ export class MyRoom extends Room<MyRoomState> {
         console.log("Game reset by server.");
     }
 
-    onLeave(client: Client, consented?: boolean) { // 'consented' पैरामीटर भी Colyseus का हिस्सा है
+    onLeave(client: Client, consented?: boolean) { // 'consented' पैराামিটার भी Colyseus का हिस्सा है
         console.log(`[Server] Player ${client.sessionId} leaving. Consented: ${consented}`);
         const player = this.state.players.get(client.sessionId); // Remove 'as Player' here
         if (player) { // Ensure player is not undefined
@@ -204,9 +204,4 @@ export class MyRoom extends Room<MyRoomState> {
         if (!this.state.gameOver && this.state.players.size < this.maxClients) {
             console.log("[Server] Game ending due to player leaving mid-game.");
             this.state.gameOver = true;
-            this.broadcast("chat", { senderName: "Server", text: "Player left, game ended!" });
-            this.state.winnerSessionId = "";
-            this.state.finalScores.clear();
-            this.broadcast("game_over", {
-                finalScores: {},
-                winnerId: "",
+            this.broadcast("chat", { senderName: "Server", text: "Player left, game ended!"
