@@ -1,5 +1,6 @@
 // src/index.ts
 import express from "express";
+import path from "path";
 import { Server } from "colyseus";
 import { MyRoom } from "./MyRoom";
 
@@ -7,7 +8,7 @@ const app = express();
 const port = Number(process.env.PORT) || 2567;
 
 // Serve static files
-app.use(express.static("../public"));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // Create HTTP server
 const server = app.listen(port, () => {
