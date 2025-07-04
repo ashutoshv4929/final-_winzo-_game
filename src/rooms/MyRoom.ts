@@ -83,9 +83,9 @@ export class MyRoom extends Room<MyRoomState> {
                 const allGameRollsCompleted = Array.from(this.state.players.values())
                     .every((p: Player) => p.history.length === this.TOTAL_TURNS);
 
-                console.log(`[Server] All game rolls completed for all rounds: ${allGameRollsCompleted}`);
+                console.log(`[Server] All game rolls completed for all rounds: ${allGameRolllsCompleted}`); // This line was fixed before, but re-added here.
 
-                if (allGameRolllsCompleted) {
+                if (allGameRollsCompleted) {
                     this.endGame();
                 } else {
                     // टर्न बदलें: अगले खिलाड़ी पर स्विच करें
@@ -107,7 +107,7 @@ export class MyRoom extends Room<MyRoomState> {
                     this.state.currentDiceValue = 0;
                     console.log("[Server] State.currentDiceValue reset to 0 for next turn.");
                 }
-            } else {
+            } else { // This is the 'else' block for allPlayersCompletedAnimation being FALSE
                 console.log("[Server] Not all players completed animation yet. Waiting...");
                 // **टर्न यहीं स्विच करें अगर गेम ऐसा है कि एक खिलाड़ी के रोल के बाद तुरंत दूसरे का टर्न आता है**
                 // आपका पुराना लॉजिक यही कर रहा था.
@@ -119,8 +119,9 @@ export class MyRoom extends Room<MyRoomState> {
                 // `currentDiceValue` को यहाँ रीसेट न करें यदि आप चाहते हैं कि डाइस तब तक दिखे जब तक सभी ने रोल न कर लिया हो।
                 // इसे 'currentRoundRolls' true होने पर ही रीसेट करें।
             }
-        });
-    }
+        } // <-- यह मिसिंग '}' था, इसे यहाँ जोड़ा गया है!
+    } // <-- यह भी शायद मिसिंग था
+    // ^^^ Lines 149/150 in the provided code snippet where the '}' was expected
 
     onJoin(client: Client, options?: any, auth?: any) { // Colyseus के onJoin सिग्नेचर में options और auth भी होते हैं
         console.log(`[Server] Player ${client.sessionId} attempting to join.`);
@@ -144,5 +145,68 @@ export class MyRoom extends Room<MyRoomState> {
         console.log("[Server] Ending game.");
         this.state.gameOver = true;
         const playersArray = Array.from(this.state.players.values()) as Player[]; // Type assertion for safety
-        const p1 = playersArray.find((p: Player) => p.playerNumber === 1); // Remove 'as Player' here, use optional chaining later
-        const p2 = playersArray.find((p: Player) => p.playerNumber === 2); // Remove 'as Player' here
+        const p1 = playersArray.find((p: Player) => p.playerNumber === 1);
+        const p2 = playersArray.find((p: Player) => p.playerNumber === 2);
+
+        this.state.finalScores.set("1", p1 ? p1.score : 0);
+        this.state.finalScores.set("2", p2 ? p2.score : 0);
+
+        if (p1 && p2) { // Use this check to ensure p1 and p2 are not undefined
+            if (p1.score > p2.score) {
+                this.state.winnerSessionId = p1.sessionId;
+            } else if (p2.score > p1.score) {
+                this.state.winnerSessionId = p2.sessionId;
+            } else {
+                this.state.winnerSessionId = ""; // Draw
+            }
+        } else {
+            this.state.winnerSessionId = "";
+        }
+
+        this.broadcast("game_over", {
+            finalScores: Object.fromEntries(this.state.finalScores),
+            winnerId: this.state.winnerSessionId,
+        });
+        console.log("Game Over. Final Scores:", this.state.finalScores.toJSON());
+    }
+
+    resetGame() { // यह क्लाइंट द्वारा 'reset_game' मैसेज पर कॉल हो सकता है
+        console.log("[Server] Resetting game state.");
+        this.state.gameOver = false;
+        this.state.winnerSessionId = "";
+        this.state.currentRound = 1;
+        this.state.finalScores.clear();
+        this.state.players.forEach((p: Player) => {
+            p.score = 0;
+            p.history.clear(); // ArraySchema के लिए .clear() का उपयोग करें
+        });
+        this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || "";
+
+        this.state.animationCompletedFlags.clear();
+        this.state.players.forEach((p: Player) => this.state.animationCompletedFlags.set(p.sessionId, false));
+        this.state.currentDiceValue = 0; // रीसेट पर डाइस वैल्यू भी रीसेट करें
+
+        this.broadcast("chat", { senderName: "Server", text: "Game reset ho gaya hai!" });
+        console.log("Game reset by server.");
+    }
+
+    onLeave(client: Client, consented?: boolean) { // 'consented' पैरामीटर भी Colyseus का हिस्सा है
+        console.log(`[Server] Player ${client.sessionId} leaving. Consented: ${consented}`);
+        const player = this.state.players.get(client.sessionId); // Remove 'as Player' here
+        if (player) { // Ensure player is not undefined
+            this.state.players.delete(client.sessionId);
+            console.log(`[Server] Player ${client.sessionId} left. Remaining players: ${this.state.players.size}`);
+        } else {
+            console.warn(`[Server] Player ${client.sessionId} not found in state on leave.`);
+        }
+        
+        // यदि गेम चल रहा था और कोई खिलाड़ी छोड़ देता है
+        if (!this.state.gameOver && this.state.players.size < this.maxClients) {
+            console.log("[Server] Game ending due to player leaving mid-game.");
+            this.state.gameOver = true;
+            this.broadcast("chat", { senderName: "Server", text: "Player left, game ended!" });
+            this.state.winnerSessionId = "";
+            this.state.finalScores.clear();
+            this.broadcast("game_over", {
+                finalScores: {},
+                winnerId: "",
