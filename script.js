@@ -45,8 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let walletBalance = 85;
 
     // --- Colyseus Client Setup ---
+    // Get the current hostname from the URL
+    const hostname = window.location.hostname;
     const client = new Colyseus.Client({
-        url: "wss://final-winzo-game-lf1r.onrender.com:2567", // आपका Render URL और पोर्ट
+        url: `wss://${hostname}:2567`, // Use the same hostname as the web page
         autoReconnect: {
             maxRetries: 10,
             delay: 1000
