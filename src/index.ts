@@ -13,17 +13,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 const server = http.createServer(app);
 const gameServer = new Server({
-    server,
-    transport: {
-        type: 'ws',
-        options: {
-            port: port,
-            wsOptions: {
-                clientTracking: true,
-                maxPayload: 1024 * 1024
-            }
-        }
-    }
+    server
 });
 
 // Colyseus रूम को डिफ़ाइन करें
