@@ -6,7 +6,7 @@ import { Server } from "colyseus";
 import { MyRoom } from "./MyRoom"; // MyRoom को यहाँ इम्पोर्ट करना सही है
 
 const app = express();
-const port = 2567; // सुनिश्चित करें कि यह पोर्ट आपके Render सर्विस पोर्ट से मेल खाता है
+const port = Number(process.env.PORT) || 2567; // Use environment port or fallback to 2567
 
 // स्टैटिक फ़ाइलों (जैसे HTML, CSS, क्लाइंट-साइड JS) को सर्व करें
 app.use(express.static(path.join(__dirname, "../public")));

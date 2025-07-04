@@ -45,17 +45,40 @@ document.addEventListener('DOMContentLoaded', () => {
     let walletBalance = 85;
 
     // --- Colyseus Client Setup ---
-    const renderServerUrl = "wss://final-winzo-game-lf1r.onrender.com"; // आपका Render URL
-
     const client = new Colyseus.Client(
-        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "ws://localhost:2567" // लोकल डेवलपमेंट के लिए
-            : renderServerUrl // Render पर डिप्लॉयमेंट के लिए
+        "wss://final-winzo-game-lf1r.onrender.com", // आपका Render URL
+        {
+            autoReconnect: {
+                maxRetries: 10,
+                delay: 1000
+            }
+        }
     );
     console.log("Attempting to connect to:", client.endpoint);
 
     let room;
     let myPlayerId;
+
+    // Connection handlers
+    client.onOpen.add(() => {
+        console.log("Connected to Colyseus server!");
+        appendChatMessage("Connected to game server!");
+        joinRoom();
+    });
+
+    client.onError.add((code, message) => {
+        console.error("Connection error:", code, message);
+        appendChatMessage(`Error: ${message}`);
+    });
+
+    client.onClose.add(() => {
+        console.log("Disconnected from Colyseus server");
+        appendChatMessage("Disconnected from game server");
+        rollBtn.disabled = true;
+        setTimeout(() => {
+            connectToColyseus(); // Try to reconnect
+        }, 5000);
+    });
 
     // --- Audio ---
     let audioContext;
