@@ -73,9 +73,8 @@ export class MyRoom extends Room<MyRoomState> {
                 console.log(`[Server] All game rolls completed for all rounds: ${allGameRollsCompleted}`);
 
                 if (allGameRollsCompleted) {
-                   endGame() {
-        console.log("Game is ending now!");
-        this.state.gameOver = true;
+                    // endGame फंक्शन को यहाँ कॉल करें
+                    this.endGame();
                 } else {
                     const ids = Array.from(this.state.players.keys());
                     const currentClientIndex = ids.indexOf(this.state.currentPlayerId);
@@ -119,10 +118,13 @@ export class MyRoom extends Room<MyRoomState> {
         } else {
             this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.size}/${this.maxClients})` });
         }
-    } // <-- यह ब्रैकेट onJoin के लिए गायब था
+    }
 
-    // endGame() और बाकी मेथड्स यहाँ आएंगे...
-    // फिलहाल, हम क्लास को सही से बंद कर रहे हैं।
-    // अगर आपके पास endGame, onLeave आदि मेथड हैं, तो उन्हें इस ब्रैकेट से पहले रखें।
-
-} // <-- यह ब्रैकेट MyRoom क्लास के लिए गायब था
+    // endGame मेथड को क्लास के अंदर यहाँ डिफाइन करें
+    endGame() {
+        console.log("Game is ending now!");
+        this.state.gameOver = true;
+        
+        // आप यहाँ विनर घोषित करने और फाइनल स्कोर भेजने का लॉजिक भी जोड़ सकते हैं
+    }
+}
