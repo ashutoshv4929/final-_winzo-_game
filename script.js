@@ -49,20 +49,26 @@ document.addEventListener('DOMContentLoaded', () => {
         url: `wss://final-winzo-game-lf1r.onrender.com:8080`,
         autoReconnect: {
             maxRetries: 10,
-            delay: 1000
-        }
+            delay: 1000,
+            maxDelay: 10000
+        },
+        pingInterval: 5000,
+        pingTimeout: 3000
     });
 
     client.onOpen.add(() => {
         console.log("Connected to server successfully!");
         appendChatMessage("Connected to game server");
         rollBtn.disabled = false;
+        console.log("Server endpoint:", client.endpoint);
     });
 
     client.onError.add((error) => {
         console.error("WebSocket error:", error);
         appendChatMessage(`Error: ${error}`);
         rollBtn.disabled = true;
+        console.log("Attempting to reconnect...");
+        setTimeout(() => connectToColyseus(), 2000);
     });
 
     client.onClose.add((code) => {
