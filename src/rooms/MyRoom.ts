@@ -144,9 +144,9 @@ export class MyRoom extends Room<MyRoomState> {
     endGame() {
         console.log("[Server] Ending game.");
         this.state.gameOver = true;
-        const playersArray = Array.from(this.state.players.values()) as Player[]; // Type assertion for safety
-        const p1 = playersArray.find((p: Player) => p.playerNumber === 1);
-        const p2 = playersArray.find((p: Player) => p.playerNumber === 2);
+        const playersArray: Player[] = Array.from(this.state.players.values()) as Player[]; // Type assertion for safety
+        const p1 = playersArray.find((p) => (p as Player).playerNumber === 1) as Player | undefined;
+        const p2 = playersArray.find((p) => (p as Player).playerNumber === 2) as Player | undefined;
 
         this.state.finalScores.set("1", p1 ? p1.score : 0);
         this.state.finalScores.set("2", p2 ? p2.score : 0);

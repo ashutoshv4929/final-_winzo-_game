@@ -1,9 +1,9 @@
-import { Schema, MapSchema, type } from '@colyseus/schema';
+import { Schema, MapSchema, ArraySchema, type } from '@colyseus/schema';
 
 export class Player extends Schema {
     playerNumber: number = 0;
     sessionId: string = "";
-    history: number[] = [];
+    history: ArraySchema<number> = new ArraySchema<number>();
     score: number = 0;
 }
 

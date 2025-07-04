@@ -1,5 +1,6 @@
 import { Room, Client } from "colyseus";
 import { MyRoomState, Player } from "./schema/MyRoomState";
+import { ArraySchema } from "@colyseus/schema";
 import { Schema } from "@colyseus/schema";
 
 // TypeScript strict mode के लिए टाइपिंग
@@ -53,7 +54,7 @@ export class MyRoom extends Room<MyRoomState> {
                 } else {
                     const playerIds = Array.from(this.state.players.keys());
                     const nextPlayerId = playerIds.find(id => id !== client.sessionId);
-                    this.state.currentPlayerId = nextPlayerId || null;
+                    this.state.currentPlayerId = nextPlayerId || "";
                     
                     const totalRolls = Array.from(this.state.players.values()).reduce((sum, p: Player) => sum + p.history.length, 0);
                     this.state.currentRound = Math.floor(totalRolls / this.maxClients) + 1;
@@ -76,7 +77,7 @@ export class MyRoom extends Room<MyRoomState> {
 
         if (this.state.players.size === this.maxClients) {
             this.state.currentRound = 1;
-            this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || null;
+            this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || "";
             this.broadcast("chat", { senderName: "Server", text: "Game Shuru!" });
         }
     }
@@ -92,7 +93,7 @@ export class MyRoom extends Room<MyRoomState> {
             this.state.finalScores.set("2", player2.score);
             if (player1.score > player2.score) { this.state.winnerSessionId = player1.sessionId; }
             else if (player2.score > player1.score) { this.state.winnerSessionId = player2.sessionId; }
-            else { this.state.winnerSessionId = null; }
+            else { this.state.winnerSessionId = ""; }
         }
         
         this.broadcast("game_over", {
@@ -103,15 +104,15 @@ export class MyRoom extends Room<MyRoomState> {
 
     resetGame() {
         this.state.gameOver = false;
-        this.state.winnerSessionId = null;
+        this.state.winnerSessionId = "";
         this.state.currentRound = 1;
         this.state.finalScores.clear();
         this.state.players.forEach(player => {
             player.score = 0;
-            player.history = [];
+            player.history = new ArraySchema<number>();
         });
         
-        this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || null;
+        this.state.currentPlayerId = Array.from(this.state.players.keys())[0] || "";
         this.broadcast("chat", { senderName: "Server", text: "Game reset ho gaya hai!" });
     }
 
