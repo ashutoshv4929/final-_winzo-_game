@@ -15,18 +15,26 @@ class MyRoom extends colyseus.Room {
       const dice = Math.floor(Math.random() * 6) + 1;
       this.players[client.sessionId].score += dice;
 
-      this.broadcast("dice_result", {
+      // डाइस रोल की जानकारी ब्रॉडकास्ट करें
+      this.broadcast("dice_rolled", {
         playerId: client.sessionId,
-        dice,
-        score: this.players[client.sessionId].score
+        roll: dice,
+        player: this.players[client.sessionId].playerNumber
       });
 
+      // टर्न अपडेट करें
+      this.currentTurn = (this.currentTurn + 1) % this.turnOrder.length;
+      if (this.currentTurn === 0) this.round++;
+      
+      // नया टर्न ब्रॉडकास्ट करें
+      this.broadcast("turn_updated", {
+        playerId: this.turnOrder[this.currentTurn],
+        playerNumber: this.players[this.turnOrder[this.currentTurn]].playerNumber
+      });
+
+      // यदि गेम खत्म हो गया है
       if (this.round >= 3 && this.currentTurn === 1) {
         this.determineWinner();
-      } else {
-        this.currentTurn = (this.currentTurn + 1) % this.turnOrder.length;
-        if (this.currentTurn === 0) this.round++;
-        this.broadcast("turn", { currentTurn: this.turnOrder[this.currentTurn] });
       }
     });
   }

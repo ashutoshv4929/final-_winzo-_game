@@ -161,13 +161,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- MESSAGES FROM SERVER ---
             room.onMessage("dice_rolled", (message) => {
                 console.log("Dice roll from server:", message);
-                // केवल पासा एनीमेशन चलाएं
-                animateDiceRoll(message.roll, message.player).then(() => {
-                    // एनीमेशन पूरा होने पर सर्वर को बताएं
-                    if (room.sessionId === message.sessionId) {
-                        room.send("animation_completed", { roll: message.roll });
-                    }
-                });
+                // पासा एनीमेशन चलाएं
+                animateDiceRoll(message.roll, message.player);
+            });
+
+            room.onMessage("turn_updated", (turnData) => {
+                if (turnData.playerId === room.sessionId) {
+                    rollBtn.disabled = false;
+                    appendChatMessage(`It's your turn now!`);
+                } else {
+                    rollBtn.disabled = true;
+                    appendChatMessage(`Waiting for other player's turn...`);
+                }
             });
 
             room.onMessage("game_over", (message) => {
@@ -266,63 +271,25 @@ document.addEventListener('DOMContentLoaded', () => {
         room.send("roll_dice");
     }
 
-    // --- UI Update Functions ---
-    function animateDiceRoll(roll, playerWhoRolled) {
-        return new Promise(resolve => {
-            diceCubeEl.classList.add('rolling');
-            playSound('dice_roll.mp3');
-            const randomX = (Math.floor(Math.random() * 6) + 4) * 360;
-            const randomY = (Math.floor(Math.random() * 6) + 4) * 360;
-            diceCubeEl.style.transform = `rotateX(${randomX}deg) rotateY(${randomY}deg)`;
-            const rollingAnimationDuration = 1500;
-            const finalSnapTransitionDuration = 500;
-            setTimeout(() => {
-                diceCubeEl.classList.remove('rolling');
-                const rotations = {
-                    1: 'rotateX(0deg) rotateY(0deg)',
-                    2: 'rotateY(180deg) rotateX(0deg)',
-                    3: 'rotateY(-90deg) rotateY(0deg)',
-                    4: 'rotateY(90deg) rotateY(0deg)',
-                    5: 'rotateX(90deg) rotateY(0deg)',
-                    6: 'rotateX(-90deg) rotateY(0deg)'
-                };
-                diceCubeEl.style.transform = rotations[roll];
-
-                setTimeout(() => {
-                    appendChatMessage(`Player ${playerWhoRolled} rolled a ${roll}!`);
-                    resolve();
-                }, finalSnapTransitionDuration + 150);
-            }, rollingAnimationDuration);
-        });
     }
+    playSound('button_click.mp3');
+    rollBtn.disabled = true;
+    appendChatMessage(`Player ${myPlayerId} is rolling...`);
+    room.send("roll_dice");
+}
 
-    function updateScoreboard(playerNumber, score) {
-        const scoreEl = document.getElementById(`score-${playerNumber}`);
-        const scoreBarEl = document.getElementById(`score-bar-${playerNumber}`);
-
-        if (scoreEl) {
-            scoreEl.textContent = score;
-        }
-        if (scoreBarEl) {
-            scoreBarEl.style.width = `${(score / (MAX_SCORE || 1)) * 100}%`;
-        }
-    }
-
-    function updateDiceHistory(playerNumber, historyArray) {
-        const historyEl = document.getElementById(`history-${playerNumber}`);
-        if (historyEl) {
-            historyEl.innerHTML = historyArray.map(r => `<span>${r}</span>`).join('') + '<span>-</span>'.repeat(TOTAL_TURNS - historyArray.length);
-        }
-    }
-
-    function updateNonScoreUI(state) {
-        if (!state || !state.players) return;
-
-        roundCounterEl.textContent = `Round ${state.currentRound === 0 ? 1 : state.currentRound} of ${TOTAL_TURNS}`;
-
-        const currentPlayerSessionId = state.currentPlayerId;
-        let currentActivePlayerNumber = 0;
-        state.players.forEach((player) => {
+// --- UI Update Functions ---
+function animateDiceRoll(roll, playerWhoRolled) {
+    const diceFaces = ['dice-1', 'dice-2', 'dice-3', 'dice-4', 'dice-5', 'dice-6'];
+    diceCubeEl.classList.remove(...diceFaces);
+    diceCubeEl.classList.add(`dice-${roll}`);
+    appendChatMessage(`Player ${playerWhoRolled} rolled a ${roll}!`);
+    
+    // टर्न अपडेट
+    if (room) {
+        room.send('turn_updated', { 
+            playerId: playerWhoRolled,
+            roll: roll
             if (player.sessionId === currentPlayerSessionId) {
                 currentActivePlayerNumber = player.playerNumber;
             }
