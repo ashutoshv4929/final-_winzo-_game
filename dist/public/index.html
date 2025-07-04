@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dice Roll Challenge: 2 Player Edition</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div id="game-container">
+        <header>
+            <h1>Dice Roll Challenge</h1>
+            <div id="wallet">💰 Wallet: ₹<span id="wallet-balance">85</span></div>
+        </header>
+
+        <main id="game-board">
+            <div class="player-panel player-1 active-player" id="player1-panel">
+                <img src="avatar-1.png" alt="Player 1" class="avatar" />
+                <div class="player-details">
+                    <div class="player-name-score">
+                        <h2>Player 1</h2>
+                        <p class="score-text">Score: <span id="score-1">0</span></p>
+                    </div>
+                    <div class="score-container">
+                        <div class="score-bar" id="score-bar-1"></div>
+                    </div>
+                </div>
+                <div class="dice-history" id="history-1">
+                    <span>-</span><span>-</span><span>-</span>
+                </div>
+            </div>
+
+            <div class="center-console">
+                <div id="round-counter">Round 1 of 3</div>
+                <div id="dice-container">
+                    <div id="dice-cube">
+                        <div class="face front" data-face="1"><div class="pip"></div></div>
+                        <div class="face back" data-face="2"><div class="pip"></div><div class="pip"></div></div>
+                        <div class="face right" data-face="3"><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+                        <div class="face left" data-face="4"><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+                        <div class="face top" data-face="6"><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+                        <div class="face bottom" data-face="5"><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+                    </div>
+                </div>
+                <div id="turn-indicator">Player 1's Turn</div>
+                <div id="chat-container">
+                    <div id="chat-messages"></div>
+                </div>
+                <button id="roll-btn">🎲 Player 1 Roll</button>
+            </div>
+
+            <div class="player-panel player-2" id="player2-panel">
+                <div class="dice-history" id="history-2">
+                    <span>-</span><span>-</span><span>-</span>
+                </div>
+                <div class="player-details">
+                    <div class="player-name-score">
+                        <h2>Player 2</h2>
+                        <p class="score-text">Score: <span id="score-2">0</span></p>
+                    </div>
+                    <div class="score-container">
+                        <div class="score-bar" id="score-bar-2"></div>
+                    </div>
+                </div>
+                <img src="avatar-2.png" alt="Player 2" class="avatar" />
+            </div>
+        </main>
+    </div>
+
+    <div id="how-to-play-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>कैसे खेलें</h2>
+            <p style="margin-bottom: 25px; font-size: 1.1rem; line-height: 1.6;">
+                दो खिलाड़ी बारी-बारी से पासा फेंकते हैं। 3 राउंड के बाद जिसका स्कोर ज़्यादा होगा, वह जीतेगा। जीतने पर ₹10 मिलते हैं, और टाई पर दोनों को ₹5 मिलते हैं।
+            </p>
+            <button id="start-game-btn" class="modal-btn">शुरू करें</button>
+        </div>
+    </div>
+
+    <div id="result-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Match Result</h2>
+            <p>Player 1 Score: <span id="final-score-1">0</span></p>
+            <p>Player 2 Score: <span id="final-score-2">0</span></p>
+            <h3 id="winner-text">🏆 Player 1 Wins!</h3>
+            <p id="prize-text" class="hidden">Prize: +₹10</p>
+            <div class="modal-buttons">
+                <button id="play-again-btn">🔁 Play Again</button>
+                <button id="watch-ad-btn">🎬 Watch Ad for +₹5</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/colyseus.js@^0.14.0/dist/colyseus.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

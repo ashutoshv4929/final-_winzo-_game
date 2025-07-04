@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && npm run copy-static",
-    "copy-static": "cp -r public dist/",
+    "copy-static": "cpx \"public/**/*\" dist/public", 
     "start": "node dist/index.js"
   },
   "keywords": [],

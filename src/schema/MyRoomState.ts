@@ -1,17 +1,19 @@
-import { Schema, MapSchema, ArraySchema, type } from '@colyseus/schema';
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
 export class Player extends Schema {
-    playerNumber: number = 0;
-    sessionId: string = "";
-    history: ArraySchema<number> = new ArraySchema<number>();
-    score: number = 0;
+  @type("number") playerNumber: number = 0;
+  @type("string") sessionId: string = "";
+  @type("number") score: number = 0;
+  @type(["number"]) history: ArraySchema<number> = new ArraySchema<number>();
 }
 
 export class MyRoomState extends Schema {
-    players = new MapSchema<Player>();
-    currentRound: number = 1;
-    currentPlayerId: string | null = null;
-    gameOver: boolean = false;
-    winnerSessionId: string | null = null;
-    finalScores = new MapSchema<number>();
+  @type({ map: Player }) players = new MapSchema<Player>();
+  @type("string") currentPlayerId: string = "";
+  @type("number") currentRound: number = 1;
+  @type("boolean") gameOver: boolean = false;
+  @type("string") winnerSessionId: string = "";
+  @type({ map: "number" }) finalScores = new MapSchema<number>();
+  // Server-only fields (not sent to client)
+  animationCompletedFlags: Map<string, boolean> = new Map();
 }
