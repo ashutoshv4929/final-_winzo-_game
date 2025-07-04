@@ -4,7 +4,7 @@ import { Server } from "colyseus";
 import { MyRoom } from "./MyRoom";
 
 const app = express();
-const port = Number(process.env.PORT) || 2567;
+const port = 2567; // Fixed port
 
 // Serve static files
 app.use(express.static(__dirname + "/../public"));
@@ -23,5 +23,5 @@ gameServer.define("my_dice_room", MyRoom);
 // Start server
 httpServer.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log(`WebSocket server available at wss://${process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost'}:${port}`);
+    console.log(`WebSocket server available at wss://final-winzo-game-lf1r.onrender.com:${port}`);
 });
