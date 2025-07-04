@@ -115,4 +115,4 @@ export class MyRoom extends Room<MyRoomState> {
             this.broadcast("chat", { senderName: "Server", text: "Game Shuru!" });
             console.log(`[Server] Game started. First turn for: ${this.state.currentPlayerId}`);
         } else {
-            this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.
+            this.broadcast("chat", { senderName: "Server", text: `Waiting for players... (${this.state.players.size}/${this.maxClients})` });
